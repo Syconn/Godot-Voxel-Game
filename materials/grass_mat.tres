@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://cy2tju3fd2y06"]
+
+[ext_resource type="Texture2D" uid="uid://cl7uvu65s4o5w" path="res://textures/grass_block.png" id="1_o6o7p"]
+
+[resource]
+albedo_texture = ExtResource("1_o6o7p")
+ao_light_affect = 0.5
+texture_filter = 0
