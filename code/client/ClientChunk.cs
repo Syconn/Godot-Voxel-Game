@@ -2,14 +2,14 @@ using Godot;
 
 namespace GodotVoxelGame.code.client;
 
-// [Tool]
+[Tool]
 public partial class ClientChunk : MeshInstance3D
 {
     [Export] public bool Dirty;
 
     public override void _Ready()
     {
-        Dirty = false;
+        // Dirty = true;
     }
 
     public override void _Process(double delta)
@@ -17,5 +17,6 @@ public partial class ClientChunk : MeshInstance3D
         if (!Dirty) return;
         Dirty = false;
         // TODO Render Chunk 
+        RenderHandler.RenderBlock(this, new Vector3(0, 0, 0));
     }
 }
