@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using Godot;
+using GodotVoxelGame.code.client.data;
+using GodotVoxelGame.code.common;
+using GodotVoxelGame.code.common.data;
 
 namespace GodotVoxelGame.code.client;
 
-public class RenderHandler
+public static class RenderHandler
 {
     private static List<Vector3> _vertices;
     private static List<Vector2> _uvs;
@@ -11,21 +14,37 @@ public class RenderHandler
     private static int _faceCount;
     private const float TexDiv = 0.5f;
 
-    public static void RenderBlock(MeshInstance3D instance, Vector3 pos)
+    public static void RenderBlock(MeshInstance3D instance, Vector3 pos, BlockData blockData)
+    {
+        ClearRender();
+        BlockWithCulling(pos, blockData);
+        GenerateMesh(instance);
+    }
+    
+    public static void RenderChunk(ClientChunk clientChunk)
+    {
+        ClearRender();
+        for (var x = 0; x < World.GetChunkSize(); x++)
+        {
+            for (var z = 0; z < World.GetChunkSize(); z++)
+            {
+                BlockWithCulling(new Vector3(x, 0, z), clientChunk.BlockData[x, 0, z]);
+            }
+        }
+        GenerateMesh(clientChunk);
+    }
+
+    private static void ClearRender()
     {
         _vertices = new List<Vector3>();
         _uvs = new List<Vector2>();
         _indices = new List<int>();
         _faceCount = 0;
-        
-        BlockWithCulling(pos);
-        GenerateMesh(instance);
     }
 
-    private static void BlockWithCulling(Vector3 pos)
+    private static void BlockWithCulling(Vector3 pos, BlockData blockData)
     {
-        // if block_is_air(pos + Vector3(0, 1, 0)): UP
-        if (true)
+        if (blockData.Faces[(int) Direction.Up].Visible)
         {
             _vertices.Add(pos + new Vector3(-0.5f, 0.5f, -0.5f));
             _vertices.Add(pos + new Vector3(0.5f, 0.5f, -0.5f));
@@ -36,8 +55,7 @@ public class RenderHandler
             AddUVs(0, 0);
         }
 
-        // if block_is_air(pos + Vector3(1, 0, 0)): EAST
-        if (true)
+        if (blockData.Faces[(int) Direction.East].Visible)
         {
             _vertices.Add(pos + new Vector3(0.5f, 0.5f, 0.5f));
             _vertices.Add(pos + new Vector3(0.5f, 0.5f, -0.5f));
@@ -48,8 +66,7 @@ public class RenderHandler
             AddUVs(0, 0);
         }
 
-        // if block_is_air(pos + Vector3(0, 0, 1)): SOUTH
-        if (true)
+        if (blockData.Faces[(int) Direction.South].Visible)
         {
             _vertices.Add(pos + new Vector3(-0.5f, 0.5f, 0.5f));
             _vertices.Add(pos + new Vector3(0.5f, 0.5f, 0.5f));
@@ -60,8 +77,7 @@ public class RenderHandler
             AddUVs(0, 0);
         }
 
-        // if block_is_air(pos + Vector3(-1, 0, 0)): WEST
-        if (true)
+        if (blockData.Faces[(int) Direction.West].Visible)
         {
             _vertices.Add(pos + new Vector3(-0.5f, 0.5f, -0.5f));
             _vertices.Add(pos + new Vector3(-0.5f, 0.5f, 0.5f));
@@ -72,8 +88,7 @@ public class RenderHandler
             AddUVs(0, 0);
         }
 
-        // if block_is_air(pos + Vector3(0, 0, -1)) NORTH
-        if (true)
+        if (blockData.Faces[(int) Direction.North].Visible)
         {
             _vertices.Add(pos + new Vector3(0.5f, 0.5f, -0.5f));
             _vertices.Add(pos + new Vector3(-0.5f, 0.5f, -0.5f));
@@ -84,7 +99,7 @@ public class RenderHandler
             AddUVs(0, 0);
         }
 
-        if (true) // BOTTOM
+        if (blockData.Faces[(int) Direction.Down].Visible)
         {
             _vertices.Add(pos + new Vector3(-0.5f, -0.5f, 0.5f));
             _vertices.Add(pos + new Vector3(0.5f, -0.5f, 0.5f));
@@ -106,11 +121,7 @@ public class RenderHandler
             meshTool.AddVertex(_vertices[i]);
         }
 
-        foreach (var i in _indices)
-        {
-            meshTool.AddIndex(i);
-        }
-
+        foreach (var i in _indices) meshTool.AddIndex(i);
         meshTool.GenerateNormals();
         instance.Mesh = meshTool.Commit();
     }

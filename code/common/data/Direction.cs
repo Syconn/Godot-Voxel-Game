@@ -5,12 +5,12 @@ namespace GodotVoxelGame.code.common.data;
 
 public enum Direction
 {
-    North,
-    East,
-    South,
-    West,
-    Up,
-    Down
+    North = 0,
+    East = 1,
+    South = 2,
+    West= 3,
+    Up = 4,
+    Down = 5
 }
 
 static class DirectionExtensions
